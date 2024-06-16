@@ -20,17 +20,23 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Debug SSH key
+        run: |
+          ls -l ~/.ssh
+          cat ~/.ssh/id_rsa
+          cat ~/.ssh/known_hosts
+
       - name: Create directory on server
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'mkdir -p ~/home/os_consumer'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'mkdir -p ~/home/os_consumer'
 
       - name: Copy files via SSH
         run: |
-          scp -i ~/.ssh/id_rsa -r ./* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:~/home/os_consumer/
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -r ./* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:~/home/os_consumer/
 
       - name: SSH into server and build Docker image
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} << 'EOF'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} << 'EOF'
             sudo apt update
             sudo apt install -y docker.io
             sudo systemctl start docker
@@ -44,5 +50,5 @@ jobs:
               -e MQ_HOST=${{ secrets.MQ_HOST }} \
               -e MQ_USER=${{ secrets.MQ_USER }} \
               -e MQ_PASSWORD=${{ secrets.MQ_PASSWORD }} \
-              -p 8000:8000 os_consumer:latest
+              -p 80:5000 os_consumer:latest
           EOF
