@@ -30,7 +30,7 @@ def start_consumer():
     # Listen to the queue and call the callback function on receiving a message
     channel.basic_consume(queue='organ_docs', on_message_callback=callback, auto_ack=True)
     # Start consuming
-    print('Началось новейшее прослушивание очереди...')
+    print('Началось новое прослушивание очереди...')
     channel.start_consuming()
 
 
