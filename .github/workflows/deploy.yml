@@ -1,0 +1,46 @@
+name: CI/CD Consumer pipeline
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Create directory on server
+        run: |
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} 'mkdir -p ~/home/os_consumer'
+
+      - name: Copy files via SSH
+        run: |
+          scp -r ./* ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }}:~/home/os_consumer/
+
+      - name: SSH into server and build Docker image
+        run: |
+          ssh ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} << 'EOF'
+            sudo apt update
+            sudo apt install -y docker.io
+            sudo systemctl start docker
+            sudo systemctl enable docker
+            cd ~/home/os_consumer
+            docker build -t os_consumer:latest .
+            docker stop os_consumer || true
+            docker rm os_consumer || true
+            docker run -d --name os_consumer \
+              -e MQ_URL_SITE=${{ secrets.MQ_URL_SITE }} \
+              -e MQ_HOST=${{ secrets.MQ_HOST }} \
+              -e MQ_USER=${{ secrets.MQ_USER }} \
+              -e MQ_PASSWORD=${{ secrets.MQ_PASSWORD }} \
+              -p 8000:8000 os_consumer:latest
+          EOF
