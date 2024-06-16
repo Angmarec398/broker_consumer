@@ -18,7 +18,6 @@ def callback(ch, method, properties, body):
     """Функция отправляет POST-запрос на сервер при создании нового сообщения в очереди"""
     new_message = json.loads(body)
     new_message.update({'message': 'message done'})
-    print(new_message)
     requests.post(url=MQ_URL_SITE, json=new_message)
 
 
