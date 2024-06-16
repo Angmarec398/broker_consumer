@@ -50,5 +50,5 @@ jobs:
               -e MQ_HOST=${{ secrets.MQ_HOST }} \
               -e MQ_USER=${{ secrets.MQ_USER }} \
               -e MQ_PASSWORD=${{ secrets.MQ_PASSWORD }} \
-              -p 80:5000 os_consumer:latest
+              -p 8001:8001 os_consumer:latest
           EOF
