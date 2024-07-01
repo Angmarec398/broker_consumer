@@ -45,7 +45,7 @@ jobs:
             docker build -t os_consumer:latest .
             docker stop os_consumer || true
             docker rm os_consumer || true
-            docker run -d --name os_consumer \
+            docker run -d --name os_consumer --restart=always\
               -e MQ_URL_SITE=${{ secrets.MQ_URL_SITE }} \
               -e MQ_HOST=${{ secrets.MQ_HOST }} \
               -e MQ_USER=${{ secrets.MQ_USER }} \

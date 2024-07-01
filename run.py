@@ -1,16 +1,15 @@
 import pika
 import json
 import requests
+import os
+from dotenv import load_dotenv
 
-try:
-    from config import MQ_HOST, MQ_PASSWORD, MQ_URL_SITE, MQ_USER
-except ImportError:
-    import os
+load_dotenv()
 
-    MQ_URL_SITE = os.getenv('MQ_URL_SITE')
-    MQ_HOST = os.getenv('MQ_HOST')
-    MQ_USER = os.getenv('MQ_USER')
-    MQ_PASSWORD = os.getenv('MQ_PASSWORD')
+MQ_URL_SITE = os.getenv('MQ_URL_SITE')
+MQ_HOST = os.getenv('MQ_HOST')
+MQ_USER = os.getenv('MQ_USER')
+MQ_PASSWORD = os.getenv('MQ_PASSWORD')
 
 
 # Create a callback function
